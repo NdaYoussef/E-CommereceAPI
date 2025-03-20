@@ -17,11 +17,13 @@ namespace TestToken.Repositories.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
-        public AccountRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITokenService tokenService, IMapper mapper) : base(context)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public AccountRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITokenService tokenService, IMapper mapper, RoleManager<IdentityRole> roleManager) : base(context)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _mapper = mapper;
+            _roleManager = roleManager;
         }
         public async Task<ResponseDto> LoginAsync(LoginDto login)
         {
@@ -271,12 +273,32 @@ namespace TestToken.Repositories.Services
             if(activeToken is null)
                 return false;
             activeToken.RevokedOn = DateTime.UtcNow;
-            var result =await _userManager.UpdateAsync(user);
-            return result.Succeeded;
-
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return false;
+            return true;
         }
 
-
+        public async Task<ResponseDto> LogoutAsync(LoginDto logout)
+        {
+           var user = await _userManager.FindByEmailAsync(logout.Email);
+            if(user is null)
+            {
+                return new ResponseDto
+                {
+                    Message = "User not found!",
+                    IsSucceeded = false,
+                    StatusCode = 404
+                };
+            }
+            if(user.refreshTokens?.Any()==true)
+                user.refreshTokens.Clear();
+            return new ResponseDto
+            {
+                Message = "User Logged out successfully1",
+                IsSucceeded = true,
+                StatusCode = 200
+            };
+        }
     }
 
 }

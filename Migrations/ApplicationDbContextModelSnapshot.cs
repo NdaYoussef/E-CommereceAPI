@@ -209,8 +209,8 @@ namespace TestToken.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<byte[]>("ProfilePicture")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("ProfilePicture")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -244,12 +244,14 @@ namespace TestToken.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("phone")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -270,6 +272,12 @@ namespace TestToken.Migrations
                     b.Property<string>("CustomerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal?>("Percentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -314,9 +322,6 @@ namespace TestToken.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -342,6 +347,9 @@ namespace TestToken.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("ShippingCost")
+                        .HasColumnType("float");
+
                     b.Property<string>("ShippingMethod")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -349,6 +357,9 @@ namespace TestToken.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TrackingCode")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -365,11 +376,14 @@ namespace TestToken.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double?>("Discount")
+                        .HasColumnType("float");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -443,7 +457,6 @@ namespace TestToken.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -478,7 +491,11 @@ namespace TestToken.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("CustomerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("ProductId")
@@ -527,10 +544,10 @@ namespace TestToken.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ProductId")
+                    b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WishlistId")
+                    b.Property<int?>("WishlistId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -602,7 +619,7 @@ namespace TestToken.Migrations
                     b.HasOne("TestToken.Models.ApplicationUser", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
@@ -689,7 +706,9 @@ namespace TestToken.Migrations
                 {
                     b.HasOne("TestToken.Models.ApplicationUser", "Customer")
                         .WithMany("Reviews")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("TestToken.Models.Product", "Product")
                         .WithMany("Reviews")
@@ -715,15 +734,11 @@ namespace TestToken.Migrations
                 {
                     b.HasOne("TestToken.Models.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.HasOne("TestToken.Models.WishList", "Wishlist")
                         .WithMany("WishlistItems")
-                        .HasForeignKey("WishlistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("WishlistId");
 
                     b.Navigation("Product");
 

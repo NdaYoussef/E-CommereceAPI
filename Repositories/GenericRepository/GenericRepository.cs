@@ -29,26 +29,21 @@ namespace TestToken.Repositories.GenericRepository
             await _context.Set<T>().AddAsync(entity);
             return entity;
         }
-        public async Task<T> updateAsync(T entity)
+        public async Task<T> UpdateAsync(T entity)
         {
-            var model = await _context.Set<T>().FindAsync(entity);
-            if(entity is not null)
-            {
-                _context.Entry(entity).CurrentValues.SetValues(model);
-                _context.Entry(entity).State = EntityState.Modified;
-                return model;
-            }
-            return null;
+            _context.Set<T>().Update(entity);
+            await _context.SaveChangesAsync();
+            return entity;
         }
-        public async Task<T> deleteAsync(int id)
+        public async Task<T> DeleteAsync(int id)
         {
             var model = await _context.Set<T>().FindAsync(id);
-            if (model is not null)
+            if (model != null)
             {
                 _context.Set<T>().Remove(model);
-                return model;
+                await _context.SaveChangesAsync();
             }
-            return null;
+            return model;
         }
     }
 }

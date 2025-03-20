@@ -39,6 +39,18 @@ namespace TestToken.Controllers
                 return Ok(account);
             return StatusCode(account.StatusCode, account.Message);
         }
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout(LoginDto login)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var account = await _unitOfWork.Customers.LogoutAsync(login);
+            if (account == null)
+                return BadRequest("Login Failed!");
+            if (account.IsSucceeded)
+                return Ok(account);
+            return StatusCode(account.StatusCode, new { account.Message });
+        }
         [HttpPut("UpdateProfile")]
         public async Task<IActionResult> UpdateProfileAsync(userDto user)
         {
@@ -97,7 +109,7 @@ namespace TestToken.Controllers
                 return BadRequest(ModelState);
             var token = await _unitOfWork.Customers.RevokeRefreshTokenAsync(email);
             if (!token)
-                return NotFound("User or active Token not fount!");
+                return NotFound("User or active Token not found!");
             return Ok("Token revoked successfully");
         }
     }

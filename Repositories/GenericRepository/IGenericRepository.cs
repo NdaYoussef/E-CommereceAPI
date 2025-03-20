@@ -6,7 +6,7 @@
       // public Task<T> GetByName(string name);
        public Task<IEnumerable<T>> GetAllAsync();
        public Task<T> AddAsync (T entity);
-       public Task<T> updateAsync(T entity);
-       public Task<T> deleteAsync(int id);
+       public Task<T> UpdateAsync(T entity);
+       public Task<T> DeleteAsync(int id);
     }
 }

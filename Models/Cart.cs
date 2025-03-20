@@ -6,6 +6,8 @@ namespace TestToken.Models
     public class Cart
     {
         public int Id { get; set; }
+        public decimal TotalPrice { get; set; }
+        public decimal? Percentage { get; set; }
         public string CustomerId { get; set; }
         [JsonIgnore]
         [ForeignKey("CustomerId")]

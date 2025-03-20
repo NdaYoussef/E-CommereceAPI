@@ -50,7 +50,7 @@ namespace TestToken.Data
                 .HasOne(c=>c.Customer)
                 .WithMany()
                 .HasForeignKey(c=>c.CustomerId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
             builder.Entity<CartItem>()
                 .HasOne(p=>p.Product)
                 .WithMany()

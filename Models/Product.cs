@@ -8,7 +8,7 @@
         public decimal Price { get; set; }
         public int StockAmount { get; set; }
         public decimal DiscountPercentage { get; set; }
-        public string Image { get; set; }
+        public string? Image { get; set; }
         public int CategoryId { get; set; }
         public Category Category { get; set; }
 

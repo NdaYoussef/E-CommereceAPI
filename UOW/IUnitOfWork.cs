@@ -19,10 +19,11 @@ namespace TestToken.UOW
 
         public IWishListRepository WishLists { get;}
 
-        public IOrderItemRepository OrderListItems { get; }
+        public IOrderItemRepository OrderItems { get; }
 
         public IOrderRepository Orders { get;}
         public ITokenService TokenService { get; }
+        public IReviewRepository Reviews { get; }
 
         Task<int> SaveCompleted();
 

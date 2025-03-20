@@ -13,6 +13,9 @@ using TestToken.UOW;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using TestToken.DTO.PaymentDto;
+using Stripe;
+using TokenService = TestToken.Repositories.Services.TokenService;
 
 
 namespace TestToken
@@ -28,12 +31,19 @@ namespace TestToken
             //add connection string 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+            // add stripe settings 
+            var stripeSettings = builder.Configuration.GetSection("Stripe").Get<StripeSettings>();
+            StripeConfiguration.ApiKey = stripeSettings!.SecretKey;
 
             //add identity
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
             //add automapper
-            builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+            // builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             //add authentication 
             builder.Services.AddAuthentication(options =>
@@ -52,13 +62,20 @@ namespace TestToken
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["JWT:Issuer"],
                     ValidAudience= builder.Configuration["JWT:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)),
                     ClockSkew = TimeSpan.Zero
                 };
+            });
+            // add authorization
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("Customer", policy => policy.RequireRole("Customer"));
             });
             //inject Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IEmailService,EmailService>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -97,7 +114,7 @@ namespace TestToken
                 }
             });
             });
-
+          
             
             var app = builder.Build();
 

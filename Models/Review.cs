@@ -11,14 +11,12 @@ namespace TestToken.Models
 
         [MaxLength(250)]
         public string Comment { get; set; }
-        [JsonIgnore]
-        public DateTime Date =>DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public int? ProductId { get; set; }
         [JsonIgnore]
         public Product? Product { get; set; }
-        [JsonIgnore]
-        public string? CustomerId { get; set; }
-        public ApplicationUser? Customer { get; set; }
+        public required string CustomerId { get; set; }
+        public ApplicationUser Customer { get; set; }
     }
 }

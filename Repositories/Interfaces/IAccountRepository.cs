@@ -7,14 +7,15 @@ namespace TestToken.Repositories.Interfaces
 {
     public interface IAccountRepository : IGenericRepository<ApplicationUser>
     {
-        public Task<ResponseDto> LoginAsync(LoginDto login);
-        public Task<ResponseDto> RegisterAsync(RegisterDto register);
-        public Task<ResponseDto> UpdateProfile(userDto userDto); 
-        public Task<ResponseDto> DeleteAccountAsync (LoginDto account);
-        public Task<ResponseDto> ChangePasswordAsync(PasswordSettingsDto passwordDto);
-        public Task<ResponseDto> ResetPasswordAsync(PasswordSettingsDto passDto);
-        public Task<ResponseDto> GenerateRefreshTokenAsync(string email);
-        public Task<bool> RevokeRefreshTokenAsync(string email);
+         Task<ResponseDto> LoginAsync(LoginDto login);
+        Task<ResponseDto> LogoutAsync(LoginDto logout);
+         Task<ResponseDto> RegisterAsync(RegisterDto register);
+        Task<ResponseDto> UpdateProfile(userDto userDto); 
+        Task<ResponseDto> DeleteAccountAsync (LoginDto account);
+        Task<ResponseDto> ChangePasswordAsync(PasswordSettingsDto passwordDto);
+        Task<ResponseDto> ResetPasswordAsync(PasswordSettingsDto passDto);
+        Task<ResponseDto> GenerateRefreshTokenAsync(string email);
+        Task<bool> RevokeRefreshTokenAsync(string email);
 
 
 
