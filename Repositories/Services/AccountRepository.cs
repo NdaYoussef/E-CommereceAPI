@@ -8,6 +8,9 @@ using TestToken.Repositories.GenericRepository;
 using TestToken.Repositories.Interfaces;
 using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
+using TestToken.Helpers;
+using System.Net;
+using TestToken.DTO.PasswordSettingsDto;
 
 namespace TestToken.Repositories.Services
 {
@@ -18,12 +21,17 @@ namespace TestToken.Repositories.Services
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public AccountRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITokenService tokenService, IMapper mapper, RoleManager<IdentityRole> roleManager) : base(context)
+        private readonly IEmailService _emailService;
+        private readonly EmailTemplateService _emailTemplateService;
+        public AccountRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITokenService tokenService, IMapper mapper,
+            IEmailService emailService,EmailTemplateService emailTemplateService,RoleManager<IdentityRole> roleManager) : base(context)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _mapper = mapper;
             _roleManager = roleManager;
+            _emailService = emailService;
+            _emailTemplateService = emailTemplateService;
         }
         public async Task<ResponseDto> LoginAsync(LoginDto login)
         {
@@ -70,12 +78,17 @@ namespace TestToken.Repositories.Services
         }
         public async Task<ResponseDto> RegisterAsync(RegisterDto register)
         {
-            if (await _userManager.FindByEmailAsync(register.Email) is not null)
-                return new ResponseDto { Message = "Email already exits!!" };
-            if (await _userManager.FindByNameAsync(register.Username) is not null)
-                return new ResponseDto { Message = "UserName already exists!!" };
+            if (await _userManager.FindByEmailAsync(register.Email) is not null 
+                || await _userManager.FindByNameAsync(register.UserName) is not null)
+                return new ResponseDto { Message = "Email or UserName already exits!!" };
+            var otp = GenerateOTP.GenerateeOTP();
+            var otpExpiry = DateTime.UtcNow.AddDays(1);
             var user =_mapper.Map<ApplicationUser>(register);
+            user.OTP = otp;
+            user.OTPExpiry = otpExpiry;
+            user.IsConfirmed = false;
             var result = await _userManager.CreateAsync(user,register.Password);
+
             if (!result.Succeeded)
             {
                 var errors = string.Empty;
@@ -89,18 +102,14 @@ namespace TestToken.Repositories.Services
                 };
             }
             await _userManager.AddToRoleAsync(user, "Customer");
-            var token = _tokenService.GenerateToken(user);
+            //  var token = _tokenService.GenerateToken(user);
+            await _emailService.sendEmailAsync(user.Email!, "OTP Email verfication", $"Hi {register.UserName} , " +
+                $"use this code below to verify your account {otp}");
             return new ResponseDto
             {
-                Message = "User registerd successfully, Thank you for your trust!",
+                Message = "OTP sent to your email. Please verify to complete registration",
                 StatusCode = 200,
                 IsSucceeded = true,
-                model = new
-                {
-                    token = token,
-                    IsAuthenticated = true,
-                    UserName = user.UserName,
-                }
             };
         }
         public async Task<ResponseDto> UpdateProfile(userDto userDto)
@@ -132,7 +141,7 @@ namespace TestToken.Repositories.Services
                 StatusCode = 200
             };
             }
-        public async Task<ResponseDto> ChangePasswordAsync(PasswordSettingsDto passwordDto)
+        public async Task<ResponseDto> ChangePasswordAsync(ChangePasswordDto passwordDto)
         {
             var user = await _userManager.FindByEmailAsync(passwordDto.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, passwordDto.CurrentPassword))
@@ -162,20 +171,42 @@ namespace TestToken.Repositories.Services
                 StatusCode = 200
             };
         }
-        public async Task<ResponseDto> ResetPasswordAsync(PasswordSettingsDto passDto)
+        public async Task<ResponseDto> ForgotPasswordAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return new ResponseDto
+                {
+                    Message = "User not found!",
+                    IsSucceeded = false,
+                    StatusCode = 404
+                };
+            }
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            string subject = "Password Reset Request";
+            string message = $"Please use the following token to reset your password: {token}";
+             await _emailService.sendEmailAsync(email, subject, message);
+            return new ResponseDto
+            {
+                Message = "Password reset link sent successfully!",
+                IsSucceeded = true,
+                StatusCode = 200
+            };
+        }
+        public async Task<ResponseDto> ResetPasswordAsync(ResetPasswordDto passDto)
         {
             var user = await _userManager.FindByEmailAsync(passDto.Email);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, passDto.CurrentPassword))
-            {
+            if (user == null)
                 return new ResponseDto
                 {
                     Message = "User not found!!",
                     IsSucceeded = false,
                     StatusCode = 400
                 };
-            }
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, token, passDto.NewPassword);
+
+            
+            var result = await _userManager.ResetPasswordAsync(user, passDto.Token, passDto.NewPassword);
             if (!result.Succeeded)
             {
                 return new ResponseDto
@@ -298,6 +329,71 @@ namespace TestToken.Repositories.Services
                 IsSucceeded = true,
                 StatusCode = 200
             };
+        }
+       public  async Task<ResponseDto> SendOtpAsync(string email)
+        {
+            var user = await _userManager.FindByIdAsync(email);
+            if(user is null)
+                return new ResponseDto
+                {
+                    Message = "User not found!",
+                    IsSucceeded = false,
+                    StatusCode = 404
+                };
+            var otp = GenerateOTP.GenerateeOTP();
+            var otpExpiry = DateTime.UtcNow.AddMinutes(15);
+            user.OTP = otp;
+            user.OTPExpiry = otpExpiry;
+            await _userManager.UpdateAsync(user);
+            return new ResponseDto
+            {
+                Message = "New OTP sent!",
+                IsSucceeded = true,
+                StatusCode = 200
+            };
+
+        }
+       public async Task<ResponseDto> VerifyOtpRequest(VerifyOtpRequest verifyOtp)
+        {
+            var user = await _userManager.FindByEmailAsync(verifyOtp.Email);
+            if (user is null)
+            return new ResponseDto
+            {
+                Message = "User not found!",
+                IsSucceeded = false,
+                StatusCode = 404
+            };
+
+            if(user.IsConfirmed)
+                return new ResponseDto
+                {
+                    Message = "User already verified!",
+                    IsSucceeded = false
+                };
+            if (user.OTP != verifyOtp.OTP || user.OTPExpiry < DateTime.UtcNow)
+                return new ResponseDto
+                {
+                    Message = "Invalid or expired OTP!",
+                    IsSucceeded = false
+                };
+            user.IsConfirmed = true;
+            user.OTP = null;
+            user.OTPExpiry = null;
+            await _userManager.UpdateAsync(user);
+            var emailBodey = _emailTemplateService.RenderWelcomeEmail(user.UserName!, user.Email!, "Customer");
+            await _emailService.sendEmailAsync(
+                user.Email!,
+                emailBodey,
+                "Welcome to E-Commerce account!"
+                );
+            return new ResponseDto
+            {
+                Message = "User verified successfully!",
+                IsSucceeded = true,
+                IsConfirmed = true,
+                StatusCode = 200
+            };
+
         }
     }
 

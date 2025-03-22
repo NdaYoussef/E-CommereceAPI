@@ -1,4 +1,5 @@
 ﻿using TestToken.DTO;
+using TestToken.DTO.PasswordSettingsDto;
 using TestToken.DTO.UserDtos;
 using TestToken.Models;
 using TestToken.Repositories.GenericRepository;
@@ -12,10 +13,13 @@ namespace TestToken.Repositories.Interfaces
          Task<ResponseDto> RegisterAsync(RegisterDto register);
         Task<ResponseDto> UpdateProfile(userDto userDto); 
         Task<ResponseDto> DeleteAccountAsync (LoginDto account);
-        Task<ResponseDto> ChangePasswordAsync(PasswordSettingsDto passwordDto);
-        Task<ResponseDto> ResetPasswordAsync(PasswordSettingsDto passDto);
+        Task<ResponseDto> ChangePasswordAsync(ChangePasswordDto passwordDto);
+        Task<ResponseDto> ForgotPasswordAsync(string email);
+        Task<ResponseDto> ResetPasswordAsync(ResetPasswordDto passDto);
         Task<ResponseDto> GenerateRefreshTokenAsync(string email);
         Task<bool> RevokeRefreshTokenAsync(string email);
+        Task<ResponseDto> SendOtpAsync(string email);
+        Task<ResponseDto> VerifyOtpRequest(VerifyOtpRequest verifyOtp);
 
 
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 using TestToken.Models;
 
 namespace TestToken.Data
@@ -56,8 +57,13 @@ namespace TestToken.Data
                 .WithMany()
                 .HasForeignKey(p=>p.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+          builder.Entity<WishList>()
+        .HasMany(w => w.WishlistItems)
+        .WithOne(wi => wi.Wishlist)
+        .HasForeignKey(wi => wi.WishlistId)
+        .OnDelete(DeleteBehavior.Cascade);
 
-            
+
 
         }
     }

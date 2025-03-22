@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TestToken.DTO.PasswordSettingsDto;
 using TestToken.DTO.UserDtos;
 using TestToken.UOW;
 
@@ -60,7 +61,7 @@ namespace TestToken.Controllers
          return StatusCode(response.StatusCode, response.Message);
         }
         [HttpPut("ChangePassword")]
-        public async Task<IActionResult> ChangePasswordAsync(PasswordSettingsDto password)
+        public async Task<IActionResult> ChangePasswordAsync(ChangePasswordDto password)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -69,9 +70,19 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode);
         }
+        [HttpPost("Forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody]string email)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var response = await _unitOfWork.Customers.ForgotPasswordAsync(email);
+            if (response.IsSucceeded)
+                return Ok(response);
+            return StatusCode(response.StatusCode, response.model);
+        }
 
-        [HttpPut("ResetPassword")]
-        public async Task<IActionResult> ResetPassswordAsync(PasswordSettingsDto password)
+            [HttpPut("ResetPassword")]
+        public async Task<IActionResult> ResetPassswordAsync(ResetPasswordDto password)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -111,6 +122,29 @@ namespace TestToken.Controllers
             if (!token)
                 return NotFound("User or active Token not found!");
             return Ok("Token revoked successfully");
+        }
+
+        [HttpPost("Send-otp")]
+        public async Task<IActionResult> SendOtp(string email)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var respone = await _unitOfWork.Customers.SendOtpAsync(email);
+            if(respone.IsSucceeded)
+                return Ok(respone.model);
+            return StatusCode(respone.StatusCode, respone.model);   
+        }
+
+
+        [HttpPost("Verify-otp")]
+        public async Task<IActionResult> VerifyOtp(VerifyOtpRequest verifyOtp)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var respone = await _unitOfWork.Customers.VerifyOtpRequest(verifyOtp);
+            if (respone.IsSucceeded)
+                return Ok(respone.model);
+            return StatusCode(respone.StatusCode, respone.model);
         }
     }
 }

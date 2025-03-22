@@ -26,8 +26,4 @@
     <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="DTO\UserDtos\PasswordSettingsDto.cs" />
-  </ItemGroup>
-
 </Project>

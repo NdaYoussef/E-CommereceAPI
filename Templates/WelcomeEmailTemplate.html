@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to EcoPowerHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #4CAF50;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+            ul li {
+                margin: 10px 0;
+            }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, {UserName}!</h1>
+        <p>Thank you for registering with us. We're excited to have you on board.</p>
+        <p>Your account has been successfully created with the following details:</p>
+        <ul>
+            <li><strong>Username:</strong> {UserName}</li>
+            <li><strong>Email:</strong> {Email}</li>
+            <li><strong>Role:</strong> {Role}</li>
+        </ul>
+        <p>If you have any questions, feel free to contact us.</p>
+        <div class="footer">
+            <p>Best regards,<br />Eco Power Hub Team</p>
+        </div>
+    </div>
+</body>
+</html>

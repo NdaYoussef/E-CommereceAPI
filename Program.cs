@@ -31,7 +31,11 @@ namespace TestToken
             //add connection string 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            // add email config 
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+            builder.Services.AddSingleton<EmailTemplateService>(provider =>
+          new EmailTemplateService(Path.Combine(Directory.GetCurrentDirectory(), "EmailTemplates", "WelcomeEmailTemplate.html")));
 
             // add stripe settings 
             var stripeSettings = builder.Configuration.GetSection("Stripe").Get<StripeSettings>();
