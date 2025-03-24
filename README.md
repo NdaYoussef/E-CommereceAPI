@@ -1,33 +1,58 @@
-# E-CommereceAPI
-Overview
+E-Commerce API 🛒
+A robust eCommerce Web API built with ASP.NET Core, designed for scalability, security, and efficient data management. This project follows Clean Architecture principles and incorporates essential features for authentication, payment processing, and user management.
 
-This is a robust eCommerce Web API built using ASP.NET Core, designed to provide a scalable and secure backend for online stores. The project follows clean architecture principles and incorporates various essential technologies for authentication, payment processing, and efficient data management.
+🚀 Features
+✅ User Authentication & Authorization – Secured using JWT tokens
 
-Features : 
-User Authentication & Authorization: Implemented using JWT tokens.
-Role-Based Access Control (RBAC): Ensures proper authorization.
-Unit of Work & Repository Pattern: For structured and efficient data management.
-Generic Repository: Reusable repository pattern for CRUD operations.
-OTP Verification: Used for secure user authentication.
-Email Service: Implemented using MailKit and MimeKit for transactional emails.
-Payment Integration: Stripe API integration for handling payments.
-Automapper: For object mapping between DTOs and domain models.
-SQL Server: As the database for reliable data storage.
-Dependency Injection (DI): For maintaining loosely coupled architecture
+✅ Role-Based Access Control (RBAC) – Ensures proper authorization for users & admins
 
-Technologies Used
+✅ Unit of Work & Repository Pattern – For structured and efficient data access
+
+✅ Generic Repository – Reusable pattern for streamlined CRUD operations
+
+✅ OTP Verification – Secure user authentication using one-time passwords
+
+✅ Email Service – Transactional emails using MailKit & MimeKit
+
+✅ Payment Integration – Stripe API for handling transactions
+
+✅ Automapper – Object mapping between DTOs and domain models
+
+✅ SQL Server – Reliable data storage
+
+✅ Dependency Injection (DI) – To maintain a loosely coupled architecture
+
+✅ Image Upload Service – Cloudinary API for secure & scalable image storage
+
+🛠 Technologies Used
 ASP.NET Core Web API
+
 JWT Authentication
+
 SQL Server
+
 MailKit & MimeKit
+
 Stripe Payment Gateway
+
 AutoMapper
+
 Unit of Work Pattern
+
 Generic Repository Pattern
+
 Dependency Injection
+
 OTP-based Authentication
 
-Setup and Installation
+Cloudinary API (for image uploads)
+
+⚙ Setup & Installation
+Prerequisites
+Ensure you have the following installed:
+
 .NET 9
+
 SQL Server
+
 Stripe API Key
