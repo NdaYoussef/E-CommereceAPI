@@ -1,4 +1,5 @@
 E-Commerce API 🛒
+
 A robust eCommerce Web API built with ASP.NET Core, designed for scalability, security, and efficient data management. This project follows Clean Architecture principles and incorporates essential features for authentication, payment processing, and user management.
 
 🚀 Features
@@ -51,7 +52,7 @@ Cloudinary API (for image uploads)
 Prerequisites
 Ensure you have the following installed:
 
-.NET 9
+.NET 8
 
 SQL Server
 
