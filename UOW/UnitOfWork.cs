@@ -46,7 +46,9 @@ namespace TestToken.UOW
             _emailSettings = options.Value;
             _emailService = emailService;
             _stripeSettings = stripeSettings;
-            Customers = new AccountRepository(_context, _userManager, _tokenService, _mapper, _emailService,_emailTemplateService,  _roleManager);
+            _emailTemplateService = emailTemplateService;
+
+            Customers = new AccountRepository(_context, _userManager, _tokenService, _mapper, _emailService,_emailTemplateService, _roleManager);
             Brands = new BrandRepository(_context, _userManager, _mapper);
             Carts = new CartRepository(_context, _userManager, _mapper);
             CartItems = new CartItemRepository(_context, _mapper);

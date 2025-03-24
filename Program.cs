@@ -16,6 +16,7 @@ using Microsoft.OpenApi.Models;
 using TestToken.DTO.PaymentDto;
 using Stripe;
 using TokenService = TestToken.Repositories.Services.TokenService;
+using CloudinaryDotNet;
 
 
 namespace TestToken
@@ -76,13 +77,53 @@ namespace TestToken
                 options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
                 options.AddPolicy("Customer", policy => policy.RequireRole("Customer"));
             });
+            //add cloudinary service 
+            // First, bind the configuration
+            var cloudinarySettings = new CloudinarySettings();
+            builder.Configuration.GetSection("CloudinarySettings").Bind(cloudinarySettings);
+
+            // Validate the settings
+            if (cloudinarySettings == null ||
+                string.IsNullOrEmpty(cloudinarySettings.CloudName) ||
+                string.IsNullOrEmpty(cloudinarySettings.ApiKey) ||
+                string.IsNullOrEmpty(cloudinarySettings.ApiSecret))
+            {
+                throw new InvalidOperationException("Cloudinary settings are not properly configured.");
+            }
+
+            // Create the Cloudinary account
+            var account = new CloudinaryDotNet.Account(
+                cloudinarySettings.CloudName,
+                cloudinarySettings.ApiKey,
+                cloudinarySettings.ApiSecret
+            );
+            builder.Services.AddLogging();
+
+            // Create the Cloudinary instance
+            var cloudinary = new Cloudinary(account);
+            // Register the Cloudinary instance in the dependency injection container
+            builder.Services.AddSingleton(cloudinary);
             //inject Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IEmailService,EmailService>();
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+            //builder.Services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowAll", builder =>
+            //    {
+            //        builder
+            //            .SetIsOriginAllowed(_ => true)
+            //            .AllowAnyMethod()
+            //            .AllowAnyHeader()
+            //            .AllowCredentials(); // Add this if needed
+            //    });
+            //});
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
+            //add swagger settings 
             builder.Services.AddSwaggerGen(options=>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo
@@ -128,7 +169,7 @@ namespace TestToken
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+           // app.UseCors("AllowAll");
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
