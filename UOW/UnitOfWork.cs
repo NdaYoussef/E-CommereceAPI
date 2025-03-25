@@ -24,7 +24,7 @@ namespace TestToken.UOW
         private readonly IEmailService _emailService;
         IOptions<StripeSettings> _stripeSettings;
         private readonly EmailTemplateService _emailTemplateService;
-
+        private readonly ILogger<AccountRepository> _logger;
 
 
         public UnitOfWork
@@ -33,7 +33,8 @@ namespace TestToken.UOW
             RoleManager<IdentityRole> roleManager,IEmailService emailService,
             IHttpContextAccessor httpContextAccessor,IOptions<EmailSettings> options,
             IOptions<StripeSettings> stripeSettings,
-            EmailTemplateService emailTemplateService
+            EmailTemplateService emailTemplateService,
+            ILogger<AccountRepository> logger
 
             )
         {
@@ -47,8 +48,9 @@ namespace TestToken.UOW
             _emailService = emailService;
             _stripeSettings = stripeSettings;
             _emailTemplateService = emailTemplateService;
+            _logger = logger;
 
-            Customers = new AccountRepository(_context, _userManager, _tokenService, _mapper, _emailService,_emailTemplateService, _roleManager);
+            Customers = new AccountRepository(_context, _userManager, _tokenService, _mapper, _emailService,_emailTemplateService, _roleManager,_logger);
             Brands = new BrandRepository(_context, _userManager, _mapper);
             Carts = new CartRepository(_context, _userManager, _mapper);
             CartItems = new CartItemRepository(_context, _mapper);

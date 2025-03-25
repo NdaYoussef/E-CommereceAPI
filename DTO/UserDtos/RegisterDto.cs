@@ -24,8 +24,7 @@ namespace TestToken.DTO.UserDtos
         [Required]
         [Compare(nameof(Password), ErrorMessage = "Password and Confirmation Passwoed don't match.!!")]
         public string ConfirmNewPassword { get; set; }
-        public string OTP { get; set; }
-        public DateTime OTPExpiry { get; set; } = DateTime.UtcNow;
+
 
     }
 }

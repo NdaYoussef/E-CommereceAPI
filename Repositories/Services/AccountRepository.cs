@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using TestToken.Helpers;
 using System.Net;
 using TestToken.DTO.PasswordSettingsDto;
+using Microsoft.EntityFrameworkCore;
 
 namespace TestToken.Repositories.Services
 {
@@ -23,8 +24,9 @@ namespace TestToken.Repositories.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IEmailService _emailService;
         private readonly EmailTemplateService _emailTemplateService;
+        private readonly ILogger<AccountRepository> _logger;
         public AccountRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITokenService tokenService, IMapper mapper,
-            IEmailService emailService,EmailTemplateService emailTemplateService,RoleManager<IdentityRole> roleManager) : base(context)
+            IEmailService emailService,EmailTemplateService emailTemplateService,RoleManager<IdentityRole> roleManager, ILogger<AccountRepository> logger) : base(context)
         {
             _userManager = userManager;
             _tokenService = tokenService;
@@ -32,6 +34,7 @@ namespace TestToken.Repositories.Services
             _roleManager = roleManager;
             _emailService = emailService;
             _emailTemplateService = emailTemplateService;
+            _logger = logger;
         }
         public async Task<ResponseDto> LoginAsync(LoginDto login)
         {
@@ -48,9 +51,9 @@ namespace TestToken.Repositories.Services
             var token = _tokenService.GenerateToken(user);
             var refreshToken = string.Empty;
             DateTime refreshTokenExpiration;
-            if (user.refreshTokens!.Any(t => t.IsActive))
+            if (user.RefreshTokens!.Any(t => t.IsActive))
             {
-                var activeToken = user.refreshTokens.FirstOrDefault(t => t.IsActive);
+                var activeToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
                 refreshToken = activeToken.Token;
                 refreshTokenExpiration = activeToken.ExpiresOn;
             }
@@ -59,10 +62,12 @@ namespace TestToken.Repositories.Services
                 var newRefreshToken = _tokenService.GenerateRefreshToken();
                 refreshToken = newRefreshToken.Token;
                 refreshTokenExpiration = newRefreshToken.ExpiresOn;
+                user.RefreshTokens.Add(newRefreshToken);
+                await _userManager.UpdateAsync(user); //save to db
             }
             return new ResponseDto
             {
-                Message = " Login successfully ",
+                Message = "User login successfully ",
                 IsSucceeded = true,
                 StatusCode = 200,
                 model = new
@@ -256,7 +261,7 @@ namespace TestToken.Repositories.Services
         public async Task<ResponseDto> GenerateRefreshTokenAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if(user == null)
+            if (user == null)
             {
                 return new ResponseDto
                 {
@@ -264,9 +269,9 @@ namespace TestToken.Repositories.Services
                     IsSucceeded = false,
                     StatusCode = 400,
                 };
-            }   
-            var activeToken = user.refreshTokens.FirstOrDefault(t=>t.IsActive);
-            if(activeToken is not null)
+            }
+            var activeToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
+            if (activeToken is not null)
             {
                 return new ResponseDto
                 {
@@ -277,35 +282,93 @@ namespace TestToken.Repositories.Services
             }
             var token = _tokenService.GenerateToken(user);
             var refreshToken = _tokenService.GenerateRefreshToken();
-            user.refreshTokens.Add(refreshToken);
+            user.RefreshTokens.Add(refreshToken);
             await _userManager.UpdateAsync(user);
+            //    return new ResponseDto
+            //    {
+            //        IsSucceeded = true,
+            //        StatusCode = 200,
+            //        model = new
+            //        {
+            //            IsAuthenticated = true,
+            //            Token = token,
+            //            RefreshToken = refreshToken,
+            //            UserName = user.UserName,
+            //            Email = user.Email,
+            //        }
+            //    };
+            //  var user = await _userManager.Users
+            //                               .Include(u => u.RefreshTokens)
+            //                               .FirstOrDefaultAsync(u => u.Email == email);
+            //  if (user == null)
+            //  {
+            //      _logger.LogWarning($"Refresh token generation attempted for non-existent email: {email}");
+            //      return new ResponseDto
+            //      {
+            //          Message = "Invalid Email!!",
+            //          IsSucceeded = false,
+            //          StatusCode = 400,
+            //      };
+            //  }
+            ////  var activeToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
+            //  if (user.RefreshTokens?.Any(t=>t.IsActive) == true)
+            //  {
+            //      _logger.LogInformation($"Active token already exists for user: {email}");
+            //      return new ResponseDto
+            //      {
+            //          Message = "Token still active",
+            //          IsSucceeded = false,
+            //          StatusCode = 400,
+            //      };
+            //  }
+            //  var token = _tokenService.GenerateToken(user);
+            //  var refreshToken = _tokenService.GenerateRefreshToken();
+            //  user.RefreshTokens.Add(refreshToken);
+            // var updatedResult =  await _userManager.UpdateAsync(user);
+            //  if (!updatedResult.Succeeded)
+            //  {
+            //      _logger.LogError($"Failed to update user with new refresh token: {email}");
+            //      return new ResponseDto
+            //      {
+            //          Message = "Token generation failed",
+            //          IsSucceeded = false,
+            //          StatusCode = 500
+            //      };
+            //  }
+            //    await _context.SaveChangesAsync();
             return new ResponseDto
             {
+                Message = "Token generated successfully", 
                 IsSucceeded = true,
                 StatusCode = 200,
                 model = new
                 {
                     IsAuthenticated = true,
                     Token = token,
-                    RefreshToken = refreshToken,
+                    RefreshToken = refreshToken.Token, 
                     UserName = user.UserName,
                     Email = user.Email,
                 }
             };
-
         }
+        
         public async Task<bool> RevokeRefreshTokenAsync(string email)
         {
-           var user = await _userManager.FindByEmailAsync(email);
-            if(user == null) 
-                return false;
-            
-            var activeToken = user.refreshTokens.FirstOrDefault(t=>t.IsActive);
-            if(activeToken is null)
-                return false;
+            var user = await _userManager.Users
+            .Include(u => u.RefreshTokens) 
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null) return false;
+           
+            var activeToken = user.RefreshTokens?.FirstOrDefault(t=>t.IsActive);
+
+            if(activeToken is null) return false;
+
             activeToken.RevokedOn = DateTime.UtcNow;
+
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded) return false;
+       //     await _context.SaveChangesAsync();
             return true;
         }
 
@@ -321,8 +384,8 @@ namespace TestToken.Repositories.Services
                     StatusCode = 404
                 };
             }
-            if(user.refreshTokens?.Any()==true)
-                user.refreshTokens.Clear();
+            if(user.RefreshTokens?.Any()==true)
+                user.RefreshTokens.Clear();
             return new ResponseDto
             {
                 Message = "User Logged out successfully1",

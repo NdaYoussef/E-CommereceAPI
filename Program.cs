@@ -44,7 +44,8 @@ namespace TestToken
 
             //add identity
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             //add automapper
             // builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
@@ -109,17 +110,6 @@ namespace TestToken
             builder.Services.AddScoped<IEmailService,EmailService>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowAll", builder =>
-            //    {
-            //        builder
-            //            .SetIsOriginAllowed(_ => true)
-            //            .AllowAnyMethod()
-            //            .AllowAnyHeader()
-            //            .AllowCredentials(); // Add this if needed
-            //    });
-            //});
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

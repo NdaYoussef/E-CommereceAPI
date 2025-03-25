@@ -19,7 +19,7 @@ namespace TestToken.Models
         public ICollection<WishList>? Wishlists { get; set; } = new List<WishList>();
         public virtual ICollection<Cart>? Carts { get; set; } = new List<Cart>();
         public virtual ICollection<Payment>? Payments { get; set; } = new List<Payment>();
-        public ICollection<RefreshToken>? refreshTokens = new List<RefreshToken>();
+        public ICollection<RefreshToken>  RefreshTokens { get; set; } = new List<RefreshToken>();
 
     }
 }

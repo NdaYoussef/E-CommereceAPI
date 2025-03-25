@@ -107,9 +107,12 @@ namespace TestToken.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             var token = await _unitOfWork.Customers.GenerateRefreshTokenAsync(email);
+
             if (token.IsSucceeded)
                 return StatusCode(token.StatusCode, token.model);
+
             return StatusCode(token.StatusCode, token.model);
         }
 
