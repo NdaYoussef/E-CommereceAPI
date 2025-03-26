@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO.PaymentDto;
 using TestToken.UOW;
@@ -15,6 +16,7 @@ namespace TestToken.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpGet("Payments")]
         public async Task<IActionResult> GetAllPayments()
         {

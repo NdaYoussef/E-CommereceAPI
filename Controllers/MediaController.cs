@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.Repositories.Interfaces;
 
@@ -15,7 +16,7 @@ namespace TestToken.Controllers
             _cloudinaryService = cloudinaryService;
             _logger = logger;
         }
-
+        [Authorize(Policy = "Admin")]
         [HttpPost("upload")]
         public async Task<IActionResult> UploadImage(IFormFile file)
         {

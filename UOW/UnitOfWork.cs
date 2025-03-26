@@ -63,8 +63,10 @@ namespace TestToken.UOW
             WishLists = new WishListRepository(_context, _mapper,_emailService);
             WishListItems = new WishlistItemRepository(_context, _mapper);
             Payments = new PaymentRepository(_context, _mapper,_stripeSettings);
+            Users = new UserRepository(_context);
         }
         public IAccountRepository Customers { get; private set; }
+        public IUserRepository Users { get; private set; }
         public IBrandRepository Brands { get; private set; }
 
         public ICartItemRepository CartItems { get; private set; }

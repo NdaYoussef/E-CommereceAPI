@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO.CartDtos;
 using TestToken.Models;
@@ -27,6 +28,7 @@ namespace TestToken.Controllers
             return StatusCode(response.StatusCode, new { response.Message });
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpGet("ItembyId/{id}")]
         public async Task<IActionResult> GetItembyId(int id )
         {
@@ -37,6 +39,7 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
         [HttpPost("AddItem")]
         public async Task<IActionResult> AddNewItem(CartItemDto cartItem)
         {
@@ -48,6 +51,7 @@ namespace TestToken.Controllers
             return StatusCode(response.StatusCode, new { response.Message });
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPut("UpdateItem")]
         public async Task<IActionResult> UpdateItem(int id ,CartItem cartItem)
         {
@@ -59,6 +63,7 @@ namespace TestToken.Controllers
             return StatusCode(response.StatusCode, new { response.Message });
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpDelete("DeleteItem/{id}")]
         public async Task<IActionResult> DeleteItem(int id)
         {

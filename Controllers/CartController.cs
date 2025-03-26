@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO.CartDtos;
 using TestToken.Models;
@@ -29,7 +30,7 @@ namespace TestToken.Controllers
             return BadRequest(ModelState);
 
         }
-
+        [Authorize(Policy = "Admin")]
         [HttpGet("CartById/{id}")]
         public async Task<IActionResult> GetCartById(int id)
         {
@@ -79,6 +80,7 @@ namespace TestToken.Controllers
             }
             return BadRequest(ModelState);
         }
+        [Authorize(Policy = "Admin")]
         [HttpDelete("DeleteCart/{id}")]
         public async Task<IActionResult> DeleteCart(int id)
         {

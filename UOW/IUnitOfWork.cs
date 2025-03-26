@@ -4,11 +4,11 @@ namespace TestToken.UOW
 {
     public interface IUnitOfWork : IDisposable
     {
+        public IUserRepository Users { get; }
         public IAccountRepository Customers { get; }
         public IBrandRepository Brands { get; }
         public ICartItemRepository CartItems { get; }
         public ICartRepository Carts { get; }
-
         public ICategoryRepository Categories { get; }
 
         public IProductRepository Products { get;  }

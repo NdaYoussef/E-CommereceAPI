@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO;
 using TestToken.Models;
@@ -27,6 +28,7 @@ namespace TestToken.Controllers
             return StatusCode(response.StatusCode, new { response.Message });
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpGet("ReviewById/{id}")]
         public async Task<IActionResult> GetReview(int id)
         {
@@ -48,6 +50,7 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
         [HttpPut("UpdateReview")]
         public async Task<IActionResult> UpdateReview( int id, [FromBody] ReviewDto review, string customerId)
         {
@@ -58,6 +61,8 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpDelete("DeleteReview/{id}")]
         public async Task<IActionResult> DeleteReview(int id, string customerId)
         {

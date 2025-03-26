@@ -443,12 +443,12 @@ namespace TestToken.Repositories.Services
             user.OTP = null;
             user.OTPExpiry = null;
             await _userManager.UpdateAsync(user);
-            var emailBodey = _emailTemplateService.RenderWelcomeEmail(user.UserName!, user.Email!, "Customer");
-            await _emailService.sendEmailAsync(
-                user.Email!,
-                emailBodey,
-                "Welcome to E-Commerce account!"
-                );
+            //var emailBodey = _emailTemplateService.RenderWelcomeEmail(user.UserName!, user.Email!, "Customer");
+            //await _emailService.sendEmailAsync(
+            //    user.Email!,
+            //    emailBodey,
+            //    "Welcome to E-Commerce account!"
+            //    );
             return new ResponseDto
             {
                 Message = "User verified successfully!",

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO.ProductDto;
 using TestToken.UOW;
@@ -25,6 +26,8 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpGet("ProductById/{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -35,6 +38,7 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
         [HttpGet("ProductByName")]
         public async Task<IActionResult> GetProductByName([FromQuery]string name)
         {
@@ -45,6 +49,7 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
         [HttpGet("ProductByCategoryName")]
         public async Task<IActionResult> GetProductByCategoryName([FromQuery]string name)
         {
@@ -55,6 +60,7 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
         [HttpGet("ProductByBrandName")]
         public async Task<IActionResult> GetProductByBrandName([FromQuery]string name)
         {
@@ -65,6 +71,8 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpPost("AddProduct")]
         public async Task<IActionResult> AddProduct(ProductDto productDto)
         {
@@ -75,6 +83,8 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpPut("EditProduct")]
         public async Task<IActionResult> EditProduct(int id ,ProductDto productDto)
         {
@@ -85,6 +95,8 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpDelete("DeleteProduct/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {

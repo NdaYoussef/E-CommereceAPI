@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO;
 using TestToken.UOW;
@@ -28,7 +29,7 @@ namespace TestToken.Controllers
             }
             return BadRequest(ModelState);
         }
-
+        [Authorize(Policy = "Admin")]
         [HttpGet("BrandById/{id}")]
         public async Task<IActionResult> GetBrandById(int id)
         {
@@ -53,7 +54,7 @@ namespace TestToken.Controllers
             }
             return StatusCode(response.StatusCode, response.Message);
         }
-
+        [Authorize(Policy = "Admin")]
         [HttpPost("AddBrand")]
         public async Task<IActionResult> AddBrand(BrandDto brandDto)
         {
@@ -65,7 +66,7 @@ namespace TestToken.Controllers
             }
             return StatusCode(response.StatusCode, response.Message);
         }
-
+        [Authorize(Policy = "Admin")]
         [HttpPut("UpdateBrand")]
         public async Task<IActionResult> UpdateBrand(int id , [FromBody]BrandDto brandDto)
         {
@@ -76,7 +77,7 @@ namespace TestToken.Controllers
                 return Ok(brand);
             return StatusCode(brand.StatusCode, brand.Message);
         }
-
+        [Authorize(Policy = "Admin")]
         [HttpDelete("DeleteBrand/{id}")]
         public async Task<IActionResult> DeleteBrand(int id)
         {

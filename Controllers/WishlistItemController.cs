@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using TestToken.DTO.WishlistDto;
@@ -27,6 +28,7 @@ namespace TestToken.Controllers
             return StatusCode(response.StatusCode , new {response.Message});
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpGet("ItemById/{id}")]
         public async Task<ActionResult> GetItemById(int id)
         {
@@ -49,6 +51,7 @@ namespace TestToken.Controllers
             return StatusCode(response.StatusCode,response);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPut("EditItem")]
         public async Task<IActionResult> UpdatedItem(int id, WishlistItemsDto item)
         {

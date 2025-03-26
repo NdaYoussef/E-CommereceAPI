@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO.OrderDto;
 using TestToken.Models;
@@ -26,6 +27,8 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpGet("ItemById/{id}")]
         public async Task<IActionResult> GetItem(int id )
         {
@@ -49,6 +52,7 @@ namespace TestToken.Controllers
             return StatusCode(response.StatusCode, new { response.Message });
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPut("UpdateItem")]
         public async Task<IActionResult> UpdateItem(int id ,OrderItemDto orderItem)
         {
@@ -60,6 +64,8 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpPut("DeleteItem/{id}")]
         public async Task<IActionResult> DeleteItem(int id)
         {

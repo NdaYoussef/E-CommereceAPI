@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO.WishlistDto;
 using TestToken.UOW;
@@ -26,6 +27,8 @@ namespace TestToken.Controllers
             return StatusCode(response.StatusCode , new {response.Message});
 
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpGet("Wishlist/{id}")]
         public async Task<IActionResult> GetWishListById(int id)
         {

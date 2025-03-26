@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO;
 using TestToken.UOW;
@@ -27,6 +28,7 @@ namespace TestToken.Controllers
 
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpGet("CategoryById/{id}")]
         public async Task<IActionResult> categoryById(int id)
         {
@@ -49,6 +51,7 @@ namespace TestToken.Controllers
             return StatusCode(response.StatusCode, new { response.Message });
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPost("AddCategory")]
         public async Task<IActionResult> AddCategory(CategoryDto categoryDto)
         {
@@ -59,6 +62,8 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpPut("UpdateCategory")]
         public async Task<IActionResult> UpdatedCategory(int id ,CategoryDto categoryDto)
         {
@@ -69,6 +74,8 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode, new { response.Message });
         }
+
+        [Authorize(Policy = "Admin")]
         [HttpPut("DeleteCategory/{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {

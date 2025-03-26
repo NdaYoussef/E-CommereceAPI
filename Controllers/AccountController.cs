@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestToken.DTO.PasswordSettingsDto;
 using TestToken.DTO.UserDtos;
@@ -101,7 +102,7 @@ namespace TestToken.Controllers
                 return Ok(response);
             return StatusCode(response.StatusCode);
         }
-
+        [Authorize(Policy ="Admin")]
         [HttpPost("GetRefreshToken")]
         public async Task<IActionResult> GetRefreshTokenAsync([FromBody]string email)
         {
@@ -115,7 +116,7 @@ namespace TestToken.Controllers
 
             return StatusCode(token.StatusCode, token.model);
         }
-
+        [Authorize(Policy = "Admin")]
         [HttpPost("RevokeRefreshToken")]
         public async Task<IActionResult> RevokeRefreshTokenAsync([FromBody] string email)
         {
@@ -126,7 +127,7 @@ namespace TestToken.Controllers
                 return NotFound("User or active Token not found!");
             return Ok("Token revoked successfully");
         }
-
+        [Authorize(Policy = "Admin")]
         [HttpPost("Send-otp")]
         public async Task<IActionResult> SendOtp(string email)
         {
@@ -146,7 +147,7 @@ namespace TestToken.Controllers
                 return BadRequest(ModelState);
             var respone = await _unitOfWork.Customers.VerifyOtpRequest(verifyOtp);
             if (respone.IsSucceeded)
-                return Ok(respone.model);
+                return Ok(respone);
             return StatusCode(respone.StatusCode, respone.model);
         }
     }
