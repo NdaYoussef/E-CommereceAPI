@@ -49,8 +49,7 @@ OTP-based Authentication
 Cloudinary API (for image uploads)
 
 ⚙ Setup & Installation
-Prerequisites
-Ensure you have the following installed:
+
 
 .NET 8
 
